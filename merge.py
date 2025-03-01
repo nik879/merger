@@ -100,15 +100,22 @@ field_mapping = {
     'email1': 'email',  # E-Mail-Adresse
     'first_name': 'first_name',  # Vorname
     'last_name': 'last_name',  # Nachname
-    'current_company': 'company',  # Unternehmen (jetzt 'current_company' -> 'company' in Mautic)
     'phone_1': 'phone',  # Telefon
-    'tags': 'tags',  # Tags
     'location_name': 'location',  # Ort
+    'profile_url': 'linked_in',  # 'profile_url' wird zu 'linked_in' in Mautic
+    'avatar': 'avatar',  # Avatar
+    'headline': 'headline',  # Headline
+    'languages': 'languages',  # Sprachen
+    'skills': 'skills',  # Fähigkeiten
+    'followers': 'followers',  # Follower
+    'current_company': 'company',  # Unternehmen (jetzt 'current_company' -> 'company' in Mautic)
+    'current_company_industry': 'industry',  # Branche
     'companyemail': 'companyemail',  # Business Email für Mautic
     'current_company_position': 'position',  # 'current_company_position' wird zu 'position' in Mautic
+    'organization_url_1': 'companylinkedin',  # 'organization_url_1' wird zu 'companylinkedin' in Mautic
+    'organization_description_1': 'companydescription',  # 'organization_description_1' wird zu 'companydescription' in Mautic
     'organization_location_1': 'companycity',  # 'organization_location_1' wird zu 'companycity' in Mautic
     'organization_website_1': 'companywebsite',  # 'organization_website_1' wird zu 'companywebsite' in Mautic
-    'profile_url': 'linked_in',  # 'profile_url' wird zu 'linked_in' in Mautic
 }
 
 # Verzeichnis mit den CSV-Dateien
