@@ -12,12 +12,8 @@ def get_email(df, email_columns, email_type_columns, target_type):
             email = df[email_column]
             email_type = df[type_column]
             
-            # Debugging-Ausgabe: Zeige die E-Mail und den Typ
-            print(f"Checking {email_column} -> Email: {email} (Type: {email_type})")
-            
             # Überprüfen, ob eine gültige E-Mail vorhanden ist und der Typ mit dem gewünschten Zieltyp übereinstimmt
             if pd.notna(email) and email_type == target_type:
-                print(f"Selected {target_type} email: {email}")
                 return email, True
     return None, False  # Return None and False if no valid email of the desired type is found
 
@@ -47,10 +43,6 @@ def merge_and_deduplicate(directory, output_csv, output_excel, field_mapping):
     # Datensätze zusammenführen
     merged_df = pd.concat(all_dfs, ignore_index=True)
     
-    # Debugging: Alle Spaltennamen ausgeben, um zu überprüfen, ob sie korrekt sind
-    print("Spaltennamen in den Daten:")
-    print(merged_df.columns.tolist())
-    
     # Definiere die Spalten für Emails und Email-Typen
     email_columns = ['email', 'third_party_email_1', 'third_party_email_2', 'third_party_email_3']
     email_type_columns = ['email_type', 'third_party_email_type_1', 'third_party_email_type_2', 'third_party_email_type_3']
@@ -61,13 +53,6 @@ def merge_and_deduplicate(directory, output_csv, output_excel, field_mapping):
     
     # Fülle die 'email' und 'companyemail' Felder
     for index, row in merged_df.iterrows():
-        # Debugging-Ausgabe: Zeige die Spaltenwerte von Email und Email-Typ
-        print(f"Row {index}:")
-        print(f"  email: {row['email']}, email_type: {row['email_type']}")
-        print(f"  third_party_email_1: {row['third_party_email_1']}, third_party_email_type_1: {row['third_party_email_type_1']}")
-        print(f"  third_party_email_2: {row['third_party_email_2']}, third_party_email_type_2: {row['third_party_email_type_2']}")
-        print(f"  third_party_email_3: {row['third_party_email_3']}, third_party_email_type_3: {row['third_party_email_type_3']}")
-        
         # Finde die erste 'personal' Email für das 'email' Feld
         personal_email, found_personal = get_email(row, email_columns, email_type_columns, 'personal')
         
@@ -93,7 +78,13 @@ def merge_and_deduplicate(directory, output_csv, output_excel, field_mapping):
     mautic_df.to_csv(output_csv, index=False, encoding='utf-8')
     mautic_df.to_excel(output_excel, index=False)
     
-    print(f"Zusammengeführte und gefilterte Dateien gespeichert unter: {output_csv} und {output_excel}")
+    # Konsolenausgabe mit Banner und wichtigsten Statistiken
+    print("="*40)
+    print("Programm erfolgreich ausgeführt")
+    print(f"Anzahl der zusammengeführten Datensätze: {len(merged_df)}")
+    print(f"Anzahl der eindeutigen Datensätze nach Duplikatentfernung: {len(deduplicated_df)}")
+    print(f"Dateien gespeichert unter: {output_csv} und {output_excel}")
+    print("="*40)
 
 # Definiere das Mapping von den Original-Feldern zu den Mautic-kompatiblen Feldern
 field_mapping = {
