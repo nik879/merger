@@ -100,6 +100,7 @@ field_mapping = {
     'skills': 'skills',  # Fähigkeiten
     'followers': 'followers',  # Follower
     'current_company': 'company',  # Unternehmen (jetzt 'current_company' -> 'company' in Mautic)
+    'current_company': 'companyname',  # 'current_company' wird zu 'companyname' in Mautic
     'current_company_industry': 'companyindustry',  # Branche
     'companyemail': 'companyemail',  # Business Email für Mautic
     'current_company_position': 'position',  # 'current_company_position' wird zu 'position' in Mautic
