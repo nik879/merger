@@ -20,6 +20,9 @@ def get_email(df, email_columns, email_type_columns, target_type):
 # Funktion zum Mappen der Quell-Daten auf das Mautic-Format
 def map_to_mautic_format(df, field_mapping):
     mautic_df = df[list(field_mapping.keys())].copy()
+    # Duplicate the 'current_company' field
+    mautic_df['companyname'] = mautic_df['current_company']
+    mautic_df = mautic_df.rename(columns=field_mapping)
     return mautic_df
 
 def merge_and_deduplicate(directory, output_csv, output_excel, field_mapping):
@@ -72,7 +75,6 @@ def merge_and_deduplicate(directory, output_csv, output_excel, field_mapping):
     
     # Mapping auf das Mautic-Format anwenden
     mautic_df = map_to_mautic_format(deduplicated_df, field_mapping)
-    mautic_df = mautic_df.rename(columns=field_mapping)
     
     # Bereinigte Dateien speichern
     mautic_df.to_csv(output_csv, index=False, encoding='utf-8')
@@ -100,7 +102,6 @@ field_mapping = {
     'skills': 'skills',  # Fähigkeiten
     'followers': 'followers',  # Follower
     'current_company': 'company',  # Unternehmen (jetzt 'current_company' -> 'company' in Mautic)
-    'current_company': 'companyname',  # 'current_company' wird zu 'companyname' in Mautic
     'current_company_industry': 'companyindustry',  # Branche
     'companyemail': 'companyemail',  # Business Email für Mautic
     'current_company_position': 'position',  # 'current_company_position' wird zu 'position' in Mautic
