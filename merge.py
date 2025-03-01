@@ -89,18 +89,18 @@ def merge_and_deduplicate(directory, output_csv, output_excel, field_mapping):
 # Definiere das Mapping von den Original-Feldern zu den Mautic-kompatiblen Feldern
 field_mapping = {
     'email1': 'email',  # E-Mail-Adresse
-    'first_name': 'First Name',  # Vorname
-    'last_name': 'Last Name',  # Nachname
+    'first_name': 'firstname',  # Vorname
+    'last_name': 'lastname',  # Nachname
     'phone_1': 'phone',  # Telefon
-    'location_name': 'Address Line 1',  # Ort
-    'profile_url': 'LinkedIn',  # 'profile_url' wird zu 'linked_in' in Mautic
+    'location_name': 'address1',  # Ort
+    'profile_url': 'linkedin',  # 'profile_url' wird zu 'linked_in' in Mautic
     'avatar': 'avatar',  # Avatar
     'headline': 'headline',  # Headline
     'languages': 'languages',  # Sprachen
     'skills': 'skills',  # Fähigkeiten
     'followers': 'followers',  # Follower
     'current_company': 'company',  # Unternehmen (jetzt 'current_company' -> 'company' in Mautic)
-    'current_company_industry': 'Industry',  # Branche
+    'current_company_industry': 'companyindustry',  # Branche
     'companyemail': 'companyemail',  # Business Email für Mautic
     'current_company_position': 'position',  # 'current_company_position' wird zu 'position' in Mautic
     'organization_url_1': 'companylinkedin',  # 'organization_url_1' wird zu 'companylinkedin' in Mautic
