@@ -18,8 +18,8 @@ def get_email(df, email_columns, email_type_columns, target_type):
             # Überprüfen, ob eine gültige E-Mail vorhanden ist und der Typ mit dem gewünschten Zieltyp übereinstimmt
             if pd.notna(email) and email_type == target_type:
                 print(f"Selected {target_type} email: {email}")
-                return email
-    return None  # Return None, wenn keine gültige E-Mail des gewünschten Typs gefunden wird
+                return email, True
+    return None, False  # Return None and False if no valid email of the desired type is found
 
 # Funktion zum Mappen der Quell-Daten auf das Mautic-Format
 def map_to_mautic_format(df, field_mapping):
@@ -69,17 +69,25 @@ def merge_and_deduplicate(directory, output_csv, output_excel, field_mapping):
         print(f"  third_party_email_3: {row['third_party_email_3']}, third_party_email_type_3: {row['third_party_email_type_3']}")
         
         # Finde die erste 'personal' Email für das 'email' Feld
-        merged_df.at[index, 'email1'] = get_email(row, email_columns, email_type_columns, 'personal')
+        personal_email, found_personal = get_email(row, email_columns, email_type_columns, 'personal')
+        
         # Finde die erste 'business' Email für das 'companyemail' Feld
-        merged_df.at[index, 'companyemail'] = get_email(row, email_columns, email_type_columns, 'business')
-    
+        business_email, _ = get_email(row, email_columns, email_type_columns, 'business')
+        
+        # Wenn keine 'personal' Email gefunden wurde, kopiere die 'business' Email in das 'email' Feld
+        if not found_personal:
+            merged_df.at[index, 'email1'] = business_email
+        else:
+            merged_df.at[index, 'email1'] = personal_email
+        
+        merged_df.at[index, 'companyemail'] = business_email
+
     # Doppelte Einträge entfernen
     deduplicated_df = merged_df.drop_duplicates()
     
     # Mapping auf das Mautic-Format anwenden
     mautic_df = map_to_mautic_format(deduplicated_df, field_mapping)
     mautic_df = mautic_df.rename(columns=field_mapping)
-    
     
     # Bereinigte Dateien speichern
     mautic_df.to_csv(output_csv, index=False, encoding='utf-8')
@@ -89,7 +97,7 @@ def merge_and_deduplicate(directory, output_csv, output_excel, field_mapping):
 
 # Definiere das Mapping von den Original-Feldern zu den Mautic-kompatiblen Feldern
 field_mapping = {
-    'email': 'email',  # E-Mail-Adresse
+    'email1': 'email',  # E-Mail-Adresse
     'first_name': 'first_name',  # Vorname
     'last_name': 'last_name',  # Nachname
     'current_company': 'company',  # Unternehmen (jetzt 'current_company' -> 'company' in Mautic)
