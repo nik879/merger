@@ -25,7 +25,7 @@ def map_to_mautic_format(df, field_mapping):
     mautic_df = mautic_df.rename(columns=field_mapping)
     return mautic_df
 
-def merge_and_deduplicate(directory, output_csv, output_excel, field_mapping):
+def process_linkedin_data(directory, field_mapping):
     all_dfs = []
     
     # Alle CSV-Dateien im Verzeichnis einlesen
@@ -33,7 +33,6 @@ def merge_and_deduplicate(directory, output_csv, output_excel, field_mapping):
         if file.endswith(".csv"):
             file_path = os.path.join(directory, file)
             try:
-                # Statt error_bad_lines das Argument on_bad_lines verwenden
                 df = pd.read_csv(file_path, encoding='utf-8', dtype=str, sep=None, engine='python', on_bad_lines='skip')
                 all_dfs.append(df)
             except Exception as e:
@@ -41,7 +40,7 @@ def merge_and_deduplicate(directory, output_csv, output_excel, field_mapping):
     
     if not all_dfs:
         print("Keine gültigen CSV-Dateien gefunden!")
-        return
+        return None
     
     # Datensätze zusammenführen
     merged_df = pd.concat(all_dfs, ignore_index=True)
@@ -76,15 +75,59 @@ def merge_and_deduplicate(directory, output_csv, output_excel, field_mapping):
     # Mapping auf das Mautic-Format anwenden
     mautic_df = map_to_mautic_format(deduplicated_df, field_mapping)
     
-    # Bereinigte Dateien speichern
-    mautic_df.to_csv(output_csv, index=False, encoding='utf-8')
-    mautic_df.to_excel(output_excel, index=False)
+    return mautic_df
+
+def process_apollo_data(directory):
+    all_dfs = []
+    
+    # Alle XLSX-Dateien im Verzeichnis einlesen
+    for file in os.listdir(directory):
+        if file.endswith(".xlsx"):
+            file_path = os.path.join(directory, file)
+            try:
+                df = pd.read_excel(file_path, dtype=str)
+                all_dfs.append(df)
+                # Print the first row of the new source file
+                print(f"Erste Zeile der Datei {file}:")
+                print(df.iloc[0])
+            except Exception as e:
+                print(f"Fehler beim Einlesen von {file}: {e}")
+    
+    if not all_dfs:
+        print("Keine gültigen Dateien gefunden!")
+        return None
+    
+    # Datensätze zusammenführen
+    merged_df = pd.concat(all_dfs, ignore_index=True)
+    
+    return merged_df
+
+def merge_and_deduplicate(linkedin_dir, apollo_dir, output_csv, output_excel, field_mapping):
+    # Process LinkedIn data
+    linkedin_df = process_linkedin_data(linkedin_dir, field_mapping)
+    if linkedin_df is None:
+        return
+    
+    # Save LinkedIn data
+    linkedin_df.to_csv(output_csv, index=False, encoding='utf-8')
+    linkedin_df.to_excel(output_excel, index=False)
+    
+    # Process Apollo data
+    apollo_df = process_apollo_data(apollo_dir)
+    if apollo_df is None:
+        return
+    
+    # Append Apollo data to LinkedIn data
+    final_df = pd.concat([linkedin_df, apollo_df], ignore_index=True)
+    
+    # Save the final merged data
+    final_df.to_csv(output_csv, index=False, encoding='utf-8')
+    final_df.to_excel(output_excel, index=False)
     
     # Konsolenausgabe mit Banner und wichtigsten Statistiken
     print("="*40)
     print("Programm erfolgreich ausgeführt")
-    print(f"Anzahl der zusammengeführten Datensätze: {len(merged_df)}")
-    print(f"Anzahl der eindeutigen Datensätze nach Duplikatentfernung: {len(deduplicated_df)}")
+    print(f"Anzahl der zusammengeführten Datensätze: {len(final_df)}")
     print(f"Dateien gespeichert unter: {output_csv} und {output_excel}")
     print("="*40)
 
@@ -111,10 +154,11 @@ field_mapping = {
     'organization_website_1': 'companywebsite',  # 'organization_website_1' wird zu 'companywebsite' in Mautic
 }
 
-# Verzeichnis mit den CSV-Dateien
-source_dir = "sources/linkedin"
+# Verzeichnisse mit den Dateien
+linkedin_dir = "sources/linkedin"
+apollo_dir = "sources/apolloexport"
 output_csv = "output/merged_profiles_mautic.csv"
 output_excel = "output/merged_profiles_mautic.xlsx"
 
 # Funktion ausführen
-merge_and_deduplicate(source_dir, output_csv, output_excel, field_mapping)
+merge_and_deduplicate(linkedin_dir, apollo_dir, output_csv, output_excel, field_mapping)
