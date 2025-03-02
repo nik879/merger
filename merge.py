@@ -92,9 +92,6 @@ def process_apollo_data(directory, apollo_field_mapping):
             try:
                 df = pd.read_excel(file_path, dtype=str)
                 all_dfs.append(df)
-                # Print the first row of the new source file
-                print(f"Erste Zeile der Datei {file}:")
-                print(df.iloc[0])
             except Exception as e:
                 print(f"Fehler beim Einlesen von {file}: {e}")
     
@@ -128,14 +125,27 @@ def merge_and_deduplicate(linkedin_dir, apollo_dir, output_csv, output_excel, fi
     # Append Apollo data to LinkedIn data
     final_df = pd.concat([linkedin_df, apollo_df], ignore_index=True)
     
+    # Reorder columns: personal information first, then company information
+    column_order = [
+        'firstname', 'lastname', 'email', 'phone', 'position', 'address1', 'country','state','city', 'linkedin', 'avatar', 'headline', 'languages', 'skills', 'followers','likely_to_engage',
+        'company', 'companyname','companynumber_of_employees', 'companyindustry', 'companyemail', 'companylinkedin', 'companydescription', 'companycity', 'companywebsite'
+    ]
+    final_df = final_df[column_order]
+    
     # Save the final merged data
     final_df.to_csv(output_csv, index=False, encoding='utf-8')
     final_df.to_excel(output_excel, index=False)
     
     # Konsolenausgabe mit Banner und wichtigsten Statistiken
+    num_emails = final_df['email'].notna().sum()
+    num_phones = final_df['phone'].notna().sum()
+    
     print("="*40)
     print("Programm erfolgreich ausgeführt")
     print(f"Anzahl der zusammengeführten Datensätze: {len(final_df)}")
+    print(f"Anzahl der eindeutigen Datensätze nach Duplikatentfernung: {len(final_df.drop_duplicates())}")
+    print(f"Anzahl der E-Mails im Datensatz: {num_emails}")
+    print(f"Anzahl der Telefonnummern im Datensatz: {num_phones}")
     print(f"Dateien gespeichert unter: {output_csv} und {output_excel}")
     print("="*40)
 
