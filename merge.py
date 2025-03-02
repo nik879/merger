@@ -28,6 +28,8 @@ def map_to_mautic_format(df, field_mapping):
 def map_apollo_to_mautic_format(df, apollo_field_mapping):
     apollo_df = df[list(apollo_field_mapping.keys())].copy()
     apollo_df = apollo_df.rename(columns=apollo_field_mapping)
+    # Populate the 'companyname' column with the same data as 'company'
+    apollo_df['companyname'] = apollo_df['company']
     return apollo_df
 
 def process_linkedin_data(directory, field_mapping):
