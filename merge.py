@@ -25,6 +25,11 @@ def map_to_mautic_format(df, field_mapping):
     mautic_df = mautic_df.rename(columns=field_mapping)
     return mautic_df
 
+def map_apollo_to_mautic_format(df, apollo_field_mapping):
+    apollo_df = df[list(apollo_field_mapping.keys())].copy()
+    apollo_df = apollo_df.rename(columns=apollo_field_mapping)
+    return apollo_df
+
 def process_linkedin_data(directory, field_mapping):
     all_dfs = []
     
@@ -77,7 +82,7 @@ def process_linkedin_data(directory, field_mapping):
     
     return mautic_df
 
-def process_apollo_data(directory):
+def process_apollo_data(directory, apollo_field_mapping):
     all_dfs = []
     
     # Alle XLSX-Dateien im Verzeichnis einlesen
@@ -100,9 +105,12 @@ def process_apollo_data(directory):
     # Datensätze zusammenführen
     merged_df = pd.concat(all_dfs, ignore_index=True)
     
-    return merged_df
+    # Mapping auf das Mautic-Format anwenden
+    apollo_df = map_apollo_to_mautic_format(merged_df, apollo_field_mapping)
+    
+    return apollo_df
 
-def merge_and_deduplicate(linkedin_dir, apollo_dir, output_csv, output_excel, field_mapping):
+def merge_and_deduplicate(linkedin_dir, apollo_dir, output_csv, output_excel, field_mapping, apollo_field_mapping):
     # Process LinkedIn data
     linkedin_df = process_linkedin_data(linkedin_dir, field_mapping)
     if linkedin_df is None:
@@ -113,7 +121,7 @@ def merge_and_deduplicate(linkedin_dir, apollo_dir, output_csv, output_excel, fi
     linkedin_df.to_excel(output_excel, index=False)
     
     # Process Apollo data
-    apollo_df = process_apollo_data(apollo_dir)
+    apollo_df = process_apollo_data(apollo_dir, apollo_field_mapping)
     if apollo_df is None:
         return
     
@@ -154,6 +162,26 @@ field_mapping = {
     'organization_website_1': 'companywebsite',  # 'organization_website_1' wird zu 'companywebsite' in Mautic
 }
 
+# Definiere das Mapping von den Apollo-Feldern zu den Mautic-kompatiblen Feldern
+apollo_field_mapping = {
+    'first_name': 'firstname',  # Vorname
+    'last_name': 'lastname',  # Nachname
+    'email': 'email',  # E-Mail-Adresse
+    'title': 'position',  # Position
+    'company_name': 'company',  # Unternehmen
+    'company_url': 'companywebsite',  # Unternehmenswebsite
+    'company_linkedin_url': 'companylinkedin',  # LinkedIn-URL des Unternehmens
+    'linkedin_url': 'linkedin',  # LinkedIn-URL des Profils
+    'headline': 'headline',  # Headline
+    'industry': 'companyindustry',  # Branche
+    'country': 'country',  # Land von Person
+    'city': 'city',  # Stadt von Person
+    'state': 'state',  # Bundesland von Person
+    'estimated_num_employees': 'companynumber_of_employees',  # Geschätzte Anzahl von Mitarbeitern im Unternehmen
+    'sanitized_phone_number': 'phone',  # Telefonnummer
+    'is_likely_to_engage': 'likely_to_engage',  # Wird eher antworten (Ja/Nein)
+}
+
 # Verzeichnisse mit den Dateien
 linkedin_dir = "sources/linkedin"
 apollo_dir = "sources/apolloexport"
@@ -161,4 +189,4 @@ output_csv = "output/merged_profiles_mautic.csv"
 output_excel = "output/merged_profiles_mautic.xlsx"
 
 # Funktion ausführen
-merge_and_deduplicate(linkedin_dir, apollo_dir, output_csv, output_excel, field_mapping)
+merge_and_deduplicate(linkedin_dir, apollo_dir, output_csv, output_excel, field_mapping, apollo_field_mapping)
