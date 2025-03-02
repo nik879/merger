@@ -1,16 +1,6 @@
 # Ignoriere die virtuelle Umgebung
 .venv/
 
-# Ignoriere die Ausgabe-Excel-Dateien
-merged_profiles.xlsx
-
-# Ignoriere den sources-Ordner (falls gewünscht, sonst entfernen)
-sources/
-
-# Ignoriere temporäre Dateien von Excel
-~$*.xls*
-*.tmp
-
 # Python-spezifische Ignorierungen
 __pycache__/
 *.pyc
