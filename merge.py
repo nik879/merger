@@ -113,8 +113,8 @@ field_mapping = {
 
 # Verzeichnis mit den CSV-Dateien
 source_dir = "sources/linkedin"
-output_csv = "output/linkedin/merged_profiles_mautic.csv"
-output_excel = "output/linkedin/merged_profiles_mautic.xlsx"
+output_csv = "output/merged_profiles_mautic.csv"
+output_excel = "output/merged_profiles_mautic.xlsx"
 
 # Funktion ausführen
 merge_and_deduplicate(source_dir, output_csv, output_excel, field_mapping)
