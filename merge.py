@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import ast
 
 # Funktion, die die E-Mails basierend auf der Logik zuordnet
 def get_email(df, email_columns, email_type_columns, target_type):
@@ -30,6 +31,11 @@ def map_apollo_to_mautic_format(df, apollo_field_mapping):
     apollo_df = apollo_df.rename(columns=apollo_field_mapping)
     # Populate the 'companyname' column with the same data as 'company'
     apollo_df['companyname'] = apollo_df['company']
+    
+    # Change the format of the 'tag' field from ["keyword1","keyword2"] to keyword1|keyword2
+    if 'tag' in apollo_df.columns:
+        apollo_df['tag'] = apollo_df['tag'].apply(lambda x: '|'.join(ast.literal_eval(x)) if pd.notna(x) else x)
+    
     return apollo_df
 
 def process_linkedin_data(directory, field_mapping):
@@ -130,7 +136,7 @@ def merge_and_deduplicate(linkedin_dir, apollo_dir, output_csv, output_excel, fi
     # Reorder columns: personal information first, then company information
     column_order = [
         'firstname', 'lastname', 'email', 'phone', 'position', 'address1', 'country','state','city', 'linkedin', 'avatar', 'headline', 'languages', 'skills', 'followers','likely_to_engage',
-        'company', 'companyname','companynumber_of_employees', 'companyindustry', 'companyemail', 'companylinkedin', 'companydescription', 'companycity', 'companywebsite'
+        'company', 'companyname','companynumber_of_employees', 'companyindustry', 'companyemail', 'companylinkedin', 'companydescription', 'companycity', 'companywebsite', 'tag'
     ]
     final_df = final_df[column_order]
     
@@ -192,6 +198,7 @@ apollo_field_mapping = {
     'estimated_num_employees': 'companynumber_of_employees',  # Geschätzte Anzahl von Mitarbeitern im Unternehmen
     'sanitized_phone_number': 'phone',  # Telefonnummer
     'is_likely_to_engage': 'likely_to_engage',  # Wird eher antworten (Ja/Nein)
+    'keywords': 'tag',  # Schlüsselwörter
 }
 
 # Verzeichnisse mit den Dateien
